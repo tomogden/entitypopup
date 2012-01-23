@@ -1,0 +1,106 @@
+<?php
+/**
+ * @file
+ * Provide drag and drop interface for creating relations.
+ *
+ */
+
+/**
+ * Implements hook_help.
+ *
+ * Displays help and module information.
+ *
+ * @param path
+ *   Which path of the site we're using to display help
+ * @param arg
+ *   Array that holds the current path as returned from arg() function
+ */
+  function entitypopup_help($path, $arg) {
+    switch ($path) {
+      case "admin/help#entitypopup":
+        $helptext  = '<p>' . t("Set popup links for node and entity pages. No permissions or configurations are necessary.") . '</p>';
+        $helptext .= '<p>' . t("The easy method is to <strong>add links in @views</strong>. ", array('@views'=>'Views')) . '</p>';
+        $helptext .= '<ol>';
+        $helptext .= '  <li>' . t("Create a new view or edit an existing view.") . '</li>';
+        $helptext .= '  <li>' . t("...") . '</li>';
+        $helptext .= '</ol>';
+        $helptext .= '<p>' . t("You can also <strong>Hand code a popup link</strong>. All it needs is any HTML element with classes of \'entitypopup viewmode-teaser\' and an id in the form of of \'@sample\'. There are really 3 three arguments, separated by dashes (\'-\').", array('@sample'=>'node-99')) . '</p>';
+        $helptext .= '<ol>';
+        $helptext .= '  <li>' . t("Argument 1 is the entity type (e.g. @entity_types).", array('@entity_types'=>'node, user, profile, relation')) . '</li>';
+        $helptext .= '  <li>' . t("Argument 2 is the entity ID or @nid for nodes.", array('@nid'=>'nid')) . '</li>';
+        $helptext .= '  <li>' . t("Argument 3 is the view mode (e.g. @view_modes), at the end of class \'@viewmode-teaser\'. You could call other view modes. For example, if you wanted to display Full Content, just use the class \'@viewmode-full\'.", array('@view_modes'=>'teaser, full, rss','@viewmode-teaser'=>'viewmode-teaser','@viewmode-full'=>'viewmode-full')) . '</li>';
+        $helptext .= '</ol>';
+        return $helptext;
+        break;
+    }
+  }
+
+/**
+ * Implements hook_menu().
+ *
+ */
+function entitypopup_menu() {
+    // AJAX: Get pop entity
+    $items['entitypopup/%'] = array(
+     'page callback'=>'entitypopup_getentity',
+     'page arguments' => array(2, 1, 3),
+     'access arguments' => array('access content'),
+     'type'=>MENU_CALLBACK,
+    );
+
+    return $items;
+  }
+  
+/**
+ * Callback function for retrieving an entity for display.
+ *
+ * @param $entity_id
+ *   ID of the source entity.
+ * @param $entity_type
+ *   Type of entity, such as 'node', 'user', 'profile', 'relation', etc.
+ * @param $view_mode
+ *   Way to display the entity, such as 'teaser', 'full', 'rss', etc.
+ */
+  function entitypopup_getentity($entity_id = NULL, $entity_type = 'node', $view_mode = 'teaser') {
+    $entity = entity_load_single($entity_type, $entity_id);
+
+    $render = entity_view($entity_type, array($entity_id=>$entity), $view_mode);
+    $output = drupal_render($render);
+
+/*
+    // Include the CTools tools that we need.
+    ctools_include('modal');
+
+    // Add CTools' javascript to the page.
+    ctools_modal_add_js();
+
+    // Create javascript that will be used to theme a modal.
+    $popup_style = array(
+      'entitypopup-popup-style' => array(
+        'modalSize' => array(
+          'type' => 'fixed',
+          'width' => 500,
+          'height' => 300,
+          'addWidth' => 20,
+          'addHeight' => 15,
+        ),
+        'modalOptions' => array(
+          'opacity' => .5,
+          'background-color' => '#000',
+        ),
+        'animation' => 'fadeIn',
+        'modalTheme' => 'CToolsSampleModal',
+        'throbber' => theme('image', array('path' => ctools_image_path('ajax-loader.gif', 'ctools_ajax_sample'), 'alt' => t('Loading...'), 'title' => t('Loading'))),
+      ),
+    );
+*/    
+    $output = '<div class="entitypopup-modal" id="entitypopup-modal-popup">' . $output . '</div>';
+
+/*
+    drupal_add_js($popup_style, 'setting');
+*/
+    
+    // Display ONLY the results, don't display within a themed page.
+    //print $output;
+    print (drupal_json_encode($output));
+  }

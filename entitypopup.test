@@ -1,0 +1,29 @@
+<?php
+/**
+ * @file
+ * Tests for the Current posts module
+ */
+
+class CurrentPostsTestCase extends DrupalWebTestCase{
+  public static function getInfo() {
+    return array(
+      'name' => 'Email Domain filter for controlling email addresses',
+      'description' => 'Tests hooks in the Email Domain module',
+      'group' => 'Fields',
+    );
+  }
+
+  public function setUp() {
+    parent::setUp('fullcontentpopup');
+  }
+
+  public function testPermission() {
+    $data = module_invoke('fullcontentpopup', 'permission');
+
+    $this->assertTrue(is_array($data), t('Permission hook returns array.'));
+
+    $this->assertTrue(array_key_exists('access fullcontentpopup content', $data),
+    t('Permission is as expected.'));
+  }
+
+}

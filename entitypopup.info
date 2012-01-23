@@ -1,0 +1,13 @@
+name = Entity Popup
+description = Uses AJAX to retrieve the a selected view mode of an entity and present it as a modal popup.
+core = 7.x
+
+configure = admin/config/user-interface/entitypopup
+
+dependencies[] = entity
+dependencies[] = views
+dependencies[] = ctools
+
+stylesheets[all][] = entitypopup.css
+
+scripts[] = entitypopup.js

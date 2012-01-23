@@ -1,0 +1,14 @@
+/* Define popup */
+.entitypopup-modal {
+  width: 300px;
+  height: auto;
+  border: 2px #999 solid;
+  z-index: 499;
+  position: absolute;
+  background: white;
+  overflow: hidden;
+  padding: 24px;
+  border-image: initial;
+  top: 200px;
+  left: 200px;
+}
