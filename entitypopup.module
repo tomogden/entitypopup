@@ -42,15 +42,23 @@
 function entitypopup_menu() {
     // AJAX: Get pop entity
     $items['entitypopup/%'] = array(
-     'page callback'=>'entitypopup_getentity',
-     'page arguments' => array(2, 1, 3),
-     'access arguments' => array('access content'),
-     'type'=>MENU_CALLBACK,
+      'page callback'=>'entitypopup_getentity',
+      'page arguments' => array(2, 1, 3),
+      'access arguments' => array('access content'),
+      'access callback' => TRUE,
+      'type'=>MENU_CALLBACK,
     );
-
+    $items['ctools_ajax_sample/%ctools_js/login'] = array(
+      'title' => 'Login',
+      'page callback' => 'ctools_ajax_sample_login',
+      'page arguments' => array(1),
+      'access callback' => TRUE,
+      'type' => MENU_CALLBACK,
+    );
+    
     return $items;
   }
-  
+
 /**
  * Callback function for retrieving an entity for display.
  *
@@ -62,45 +70,18 @@ function entitypopup_menu() {
  *   Way to display the entity, such as 'teaser', 'full', 'rss', etc.
  */
   function entitypopup_getentity($entity_id = NULL, $entity_type = 'node', $view_mode = 'teaser') {
-    $entity = entity_load_single($entity_type, $entity_id);
+    /* Define JavaScript ------------------------------------------- */
+      // Include the CTools tools that we need.
+      ctools_include('modal');
 
-    $render = entity_view($entity_type, array($entity_id=>$entity), $view_mode);
-    $output = drupal_render($render);
 
-/*
-    // Include the CTools tools that we need.
-    ctools_include('modal');
+    /* Define Content ------------------------------------------- */    
+      $entity = entity_load_single($entity_type, $entity_id);
+  
+      $render = entity_view($entity_type, array($entity_id=>$entity), $view_mode);
+      $output = drupal_render($render);
+      
+      $output = '<div class="entitypopup-modal" id="entitypopup-modal-popup">' . $output . '</div>';
 
-    // Add CTools' javascript to the page.
-    ctools_modal_add_js();
-
-    // Create javascript that will be used to theme a modal.
-    $popup_style = array(
-      'entitypopup-popup-style' => array(
-        'modalSize' => array(
-          'type' => 'fixed',
-          'width' => 500,
-          'height' => 300,
-          'addWidth' => 20,
-          'addHeight' => 15,
-        ),
-        'modalOptions' => array(
-          'opacity' => .5,
-          'background-color' => '#000',
-        ),
-        'animation' => 'fadeIn',
-        'modalTheme' => 'CToolsSampleModal',
-        'throbber' => theme('image', array('path' => ctools_image_path('ajax-loader.gif', 'ctools_ajax_sample'), 'alt' => t('Loading...'), 'title' => t('Loading'))),
-      ),
-    );
-*/    
-    $output = '<div class="entitypopup-modal" id="entitypopup-modal-popup">' . $output . '</div>';
-
-/*
-    drupal_add_js($popup_style, 'setting');
-*/
-    
-    // Display ONLY the results, don't display within a themed page.
-    //print $output;
-    print (drupal_json_encode($output));
+      ctools_modal_render(NULL, $output);  
   }
